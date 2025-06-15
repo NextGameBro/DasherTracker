@@ -1,0 +1,772 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DoorDash Expense Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+        
+        .content {
+            padding: 20px;
+            min-height: 400px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .expense-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .expense-item h4 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .expense-item p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        
+        .expense-amount {
+            font-weight: 700;
+            color: #28a745;
+            font-size: 16px;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .summary-card h3 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        
+        .summary-card p {
+            opacity: 0.9;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-card h4 {
+            font-size: 20px;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card p {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        
+        .data-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #0066cc;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 40px 20px;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+        }
+        
+        .mileage-tracker {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .mileage-display {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .mileage-display h3 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .mileage-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .mileage-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .start-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .end-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .mileage-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 DoorDash Tracker</h1>
+            <p>Track miles & expenses for taxes</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('mileage')">Miles</button>
+            <button class="tab" onclick="switchTab('gas')">Gas</button>
+            <button class="tab" onclick="switchTab('summary')">Summary</button>
+        </div>
+        
+        <div class="content">
+            <!-- Mileage Tab -->
+            <div id="mileage-tab" class="tab-content active">
+                <div class="mileage-tracker">
+                    <div class="mileage-display">
+                        <h3 id="current-miles">0.0</h3>
+                        <p>Miles Today</p>
+                    </div>
+                    <div class="mileage-buttons">
+                        <button class="mileage-btn start-btn" id="start-btn" onclick="startTrip()">Start Trip</button>
+                        <button class="mileage-btn end-btn" id="end-btn" onclick="endTrip()" disabled>End Trip</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Manual Miles Entry</label>
+                    <input type="number" id="manual-miles" placeholder="Enter miles" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Purpose</label>
+                    <select id="mile-purpose">
+                        <option value="delivery">Delivery</option>
+                        <option value="to-restaurant">To Restaurant</option>
+                        <option value="between-orders">Between Orders</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="addManualMiles()">Add Miles</button>
+                
+                <div id="mileage-list"></div>
+            </div>
+            
+            <!-- Gas Tab -->
+            <div id="gas-tab" class="tab-content">
+                <div class="form-group">
+                    <label>Gas Station</label>
+                    <input type="text" id="gas-station" placeholder="Shell, Exxon, etc.">
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="gas-amount" placeholder="25.50" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Gallons</label>
+                    <input type="number" id="gas-gallons" placeholder="8.5" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="gas-date">
+                </div>
+                <div class="form-group">
+                    <label>Notes (Optional)</label>
+                    <textarea id="gas-notes" placeholder="Receipt number, location, etc."></textarea>
+                </div>
+                <button class="btn" onclick="addGasReceipt()">Add Gas Receipt</button>
+                
+                <div id="gas-receipts"></div>
+            </div>
+            
+            <!-- Summary Tab -->
+            <div id="summary-tab" class="tab-content">
+                <div class="data-info">
+                    <h4>💾 Data Management</h4>
+                    <p>Your data is saved in your browser session. Use the buttons below to:</p>
+                    <ul>
+                        <li><strong>Save Data:</strong> Download your complete records as a file</li>
+                        <li><strong>Load Data:</strong> Restore previously saved data</li>
+                        <li><strong>Export for Taxes:</strong> Generate a formatted tax report</li>
+                    </ul>
+                </div>
+                
+                <div class="summary-card">
+                    <h3 id="total-deduction">$0.00</h3>
+                    <p>Estimated Tax Deduction</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4 id="total-miles">0</h4>
+                        <p>Total Miles</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="total-gas">$0</h4>
+                        <p>Total Gas</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="total-trips">0</h4>
+                        <p>Total Trips</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="avg-mpg">0</h4>
+                        <p>Avg MPG</p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                    <button class="btn" onclick="exportData()">Export for Taxes</button>
+                    <button class="btn" onclick="saveAllData()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">Save Data</button>
+                </div>
+                <button class="btn" onclick="loadAllData()" style="margin-top: 10px; background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">Load Data</button>
+                <button class="btn" onclick="clearAllData()" style="margin-top: 10px; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">Clear All Data</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Data storage
+        let mileageData = [];
+        let gasData = [];
+        let currentTrip = null;
+        let startOdometer = null;
+        
+        // IRS standard mileage rate for 2024
+        const MILEAGE_RATE = 0.67;
+        
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateSummary();
+            renderMileageList();
+            renderGasReceipts();
+            
+            // Set today's date as default
+            document.getElementById('gas-date').value = new Date().toISOString().split('T')[0];
+        });
+        
+        function switchTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+        
+        function startTrip() {
+            const odometer = prompt('Enter current odometer reading:');
+            if (odometer && !isNaN(odometer)) {
+                startOdometer = parseFloat(odometer);
+                currentTrip = {
+                    start: startOdometer,
+                    startTime: new Date().toISOString()
+                };
+                
+                document.getElementById('start-btn').disabled = true;
+                document.getElementById('end-btn').disabled = false;
+                
+                saveData();
+                alert('Trip started! Odometer: ' + startOdometer);
+            }
+        }
+        
+        function endTrip() {
+            const odometer = prompt('Enter current odometer reading:');
+            if (odometer && !isNaN(odometer) && currentTrip) {
+                const endOdometer = parseFloat(odometer);
+                const miles = endOdometer - currentTrip.start;
+                
+                if (miles > 0) {
+                    const purpose = prompt('Trip purpose:', 'delivery') || 'delivery';
+                    
+                    mileageData.push({
+                        miles: miles,
+                        purpose: purpose,
+                        date: new Date().toISOString().split('T')[0],
+                        startOdometer: currentTrip.start,
+                        endOdometer: endOdometer,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    currentTrip = null;
+                    startOdometer = null;
+                    
+                    document.getElementById('start-btn').disabled = false;
+                    document.getElementById('end-btn').disabled = true;
+                    
+                    saveData();
+                    updateSummary();
+                    renderMileageList();
+                    
+                    alert(`Trip completed! ${miles.toFixed(1)} miles recorded.`);
+                } else {
+                    alert('Invalid odometer reading. Please try again.');
+                }
+            }
+        }
+        
+        function addManualMiles() {
+            const miles = parseFloat(document.getElementById('manual-miles').value);
+            const purpose = document.getElementById('mile-purpose').value;
+            
+            if (miles && miles > 0) {
+                mileageData.push({
+                    miles: miles,
+                    purpose: purpose,
+                    date: new Date().toISOString().split('T')[0],
+                    timestamp: new Date().toISOString(),
+                    manual: true
+                });
+                
+                document.getElementById('manual-miles').value = '';
+                
+                saveData();
+                updateSummary();
+                renderMileageList();
+            }
+        }
+        
+        function addGasReceipt() {
+            const station = document.getElementById('gas-station').value;
+            const amount = parseFloat(document.getElementById('gas-amount').value);
+            const gallons = parseFloat(document.getElementById('gas-gallons').value);
+            const date = document.getElementById('gas-date').value;
+            const notes = document.getElementById('gas-notes').value;
+            
+            if (station && amount && gallons && date) {
+                gasData.push({
+                    station: station,
+                    amount: amount,
+                    gallons: gallons,
+                    date: date,
+                    notes: notes,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Clear form
+                document.getElementById('gas-station').value = '';
+                document.getElementById('gas-amount').value = '';
+                document.getElementById('gas-gallons').value = '';
+                document.getElementById('gas-notes').value = '';
+                
+                saveData();
+                updateSummary();
+                renderGasReceipts();
+            }
+        }
+        
+        function renderMileageList() {
+            const container = document.getElementById('mileage-list');
+            
+            if (mileageData.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No miles recorded</h3><p>Start tracking your DoorDash miles</p></div>';
+                return;
+            }
+            
+            container.innerHTML = mileageData.map((item, index) => `
+                <div class="expense-item">
+                    <h4>${item.miles.toFixed(1)} miles - ${item.purpose}</h4>
+                    <p>Date: ${item.date}</p>
+                    ${item.manual ? '<p>Manual entry</p>' : '<p>Odometer: ' + (item.startOdometer || 'N/A') + ' - ' + (item.endOdometer || 'N/A') + '</p>'}
+                    <p class="expense-amount">$${(item.miles * MILEAGE_RATE).toFixed(2)} deduction</p>
+                    <button class="delete-btn" onclick="deleteMileage(${index})">Delete</button>
+                </div>
+            `).join('');
+            
+            // Update today's miles
+            const today = new Date().toISOString().split('T')[0];
+            const todayMiles = mileageData
+                .filter(item => item.date === today)
+                .reduce((sum, item) => sum + item.miles, 0);
+            document.getElementById('current-miles').textContent = todayMiles.toFixed(1);
+        }
+        
+        function renderGasReceipts() {
+            const container = document.getElementById('gas-receipts');
+            
+            if (gasData.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No gas receipts</h3><p>Add your gas purchases</p></div>';
+                return;
+            }
+            
+            container.innerHTML = gasData.map((item, index) => `
+                <div class="expense-item">
+                    <h4>${item.station}</h4>
+                    <p>Date: ${item.date}</p>
+                    <p>${item.gallons} gallons @ ${(item.amount / item.gallons).toFixed(2)}/gal</p>
+                    ${item.notes ? '<p>Notes: ' + item.notes + '</p>' : ''}
+                    <p class="expense-amount">$${item.amount.toFixed(2)}</p>
+                    <button class="delete-btn" onclick="deleteGas(${index})">Delete</button>
+                </div>
+            `).join('');
+        }
+        
+        function updateSummary() {
+            const totalMiles = mileageData.reduce((sum, item) => sum + item.miles, 0);
+            const totalGas = gasData.reduce((sum, item) => sum + item.amount, 0);
+            const totalGallons = gasData.reduce((sum, item) => sum + item.gallons, 0);
+            const mileageDeduction = totalMiles * MILEAGE_RATE;
+            
+            document.getElementById('total-deduction').textContent = '$' + mileageDeduction.toFixed(2);
+            document.getElementById('total-miles').textContent = totalMiles.toFixed(1);
+            document.getElementById('total-gas').textContent = '$' + totalGas.toFixed(0);
+            document.getElementById('total-trips').textContent = mileageData.length;
+            document.getElementById('avg-mpg').textContent = totalGallons > 0 ? (totalMiles / totalGallons).toFixed(1) : '0';
+        }
+        
+        function deleteMileage(index) {
+            if (confirm('Delete this mileage entry?')) {
+                mileageData.splice(index, 1);
+                saveData();
+                updateSummary();
+                renderMileageList();
+            }
+        }
+        
+        function deleteGas(index) {
+            if (confirm('Delete this gas receipt?')) {
+                gasData.splice(index, 1);
+                saveData();
+                updateSummary();
+                renderGasReceipts();
+            }
+        }
+        
+        function saveData() {
+            const data = {
+                mileage: mileageData,
+                gas: gasData,
+                currentTrip: currentTrip,
+                startOdometer: startOdometer
+            };
+            // Data is kept in memory during the session
+            // Use Save Data button to download for permanent storage
+        }
+        
+        function loadData() {
+            // Data is loaded from memory during the session
+            // Use Load Data button to restore from saved file
+        }
+        
+        function saveAllData() {
+            const data = {
+                mileage: mileageData,
+                gas: gasData,
+                currentTrip: currentTrip,
+                startOdometer: startOdometer,
+                savedDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'doordash-data-' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('Data saved! Keep this file safe to restore your data later.');
+        }
+        
+        function loadAllData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            
+                            // Validate data structure
+                            if (data.mileage && data.gas && Array.isArray(data.mileage) && Array.isArray(data.gas)) {
+                                mileageData = data.mileage;
+                                gasData = data.gas;
+                                currentTrip = data.currentTrip || null;
+                                startOdometer = data.startOdometer || null;
+                                
+                                // Update button states if there's an active trip
+                                if (currentTrip) {
+                                    document.getElementById('start-btn').disabled = true;
+                                    document.getElementById('end-btn').disabled = false;
+                                } else {
+                                    document.getElementById('start-btn').disabled = false;
+                                    document.getElementById('end-btn').disabled = true;
+                                }
+                                
+                                // Refresh all displays
+                                updateSummary();
+                                renderMileageList();
+                                renderGasReceipts();
+                                
+                                const loadedDate = data.savedDate ? new Date(data.savedDate).toLocaleDateString() : 'Unknown';
+                                alert(`Data loaded successfully!\nSaved on: ${loadedDate}\nMileage entries: ${mileageData.length}\nGas receipts: ${gasData.length}`);
+                            } else {
+                                alert('Invalid data file format. Please select a valid DoorDash data file.');
+                            }
+                        } catch (error) {
+                            alert('Error reading file. Please make sure it\'s a valid JSON file from this app.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+        
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear ALL data? This cannot be undone!\n\nMake sure you\'ve saved your data first if you want to keep it.')) {
+                if (confirm('This will delete all mileage entries, gas receipts, and trip data. Are you absolutely sure?')) {
+                    mileageData = [];
+                    gasData = [];
+                    currentTrip = null;
+                    startOdometer = null;
+                    
+                    // Reset button states
+                    document.getElementById('start-btn').disabled = false;
+                    document.getElementById('end-btn').disabled = true;
+                    
+                    // Refresh all displays
+                    updateSummary();
+                    renderMileageList();
+                    renderGasReceipts();
+                    
+                    alert('All data has been cleared.');
+                }
+            }
+        }
+        
+        function exportData() {
+            const totalMiles = mileageData.reduce((sum, item) => sum + item.miles, 0);
+            const mileageDeduction = totalMiles * MILEAGE_RATE;
+            const totalGas = gasData.reduce((sum, item) => sum + item.amount, 0);
+            
+            const exportText = `
+DoorDash Tax Summary
+==================
+
+Mileage Deduction: $${mileageDeduction.toFixed(2)}
+Total Miles: ${totalMiles.toFixed(1)}
+Standard Rate: $${MILEAGE_RATE}/mile
+
+Gas Expenses: $${totalGas.toFixed(2)}
+
+Detailed Mileage Log:
+${mileageData.map(item => 
+    `${item.date}: ${item.miles.toFixed(1)} miles (${item.purpose}) - $${(item.miles * MILEAGE_RATE).toFixed(2)}`
+).join('\n')}
+
+Gas Receipts:
+${gasData.map(item => 
+    `${item.date}: ${item.station} - $${item.amount.toFixed(2)} (${item.gallons} gal)`
+).join('\n')}
+            `.trim();
+            
+            // Create downloadable text file
+            const blob = new Blob([exportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'doordash-expenses-' + new Date().toISOString().split('T')[0] + '.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
