@@ -417,7 +417,6 @@
     <script>
         // Data storage
         let mileageData = [];
-                localStorage.removeItem('doordashTrackerData');
         let gasData = [];
         let currentTrip = null;
         let startOdometer = null;
@@ -626,14 +625,6 @@
         }
         
         function saveData() {
-    const data = {
-        mileage: mileageData,
-        gas: gasData,
-        currentTrip: currentTrip,
-        startOdometer: startOdometer
-    };
-    localStorage.setItem('doordashTrackerData', JSON.stringify(data));
-
             const data = {
                 mileage: mileageData,
                 gas: gasData,
@@ -645,30 +636,6 @@
         }
         
         function loadData() {
-    const stored = localStorage.getItem('doordashTrackerData');
-    if (stored) {
-        try {
-            const data = JSON.parse(stored);
-            if (data.mileage && data.gas) {
-                mileageData = data.mileage;
-                gasData = data.gas;
-                currentTrip = data.currentTrip || null;
-                startOdometer = data.startOdometer || null;
-
-                if (currentTrip) {
-                    document.getElementById('start-btn').disabled = true;
-                    document.getElementById('end-btn').disabled = false;
-                }
-
-                updateSummary();
-                renderMileageList();
-                renderGasReceipts();
-            }
-        } catch (e) {
-            console.error("Failed to load saved data from localStorage", e);
-        }
-    }
-
             // Data is loaded from memory during the session
             // Use Load Data button to restore from saved file
         }
@@ -747,7 +714,6 @@
             if (confirm('Are you sure you want to clear ALL data? This cannot be undone!\n\nMake sure you\'ve saved your data first if you want to keep it.')) {
                 if (confirm('This will delete all mileage entries, gas receipts, and trip data. Are you absolutely sure?')) {
                     mileageData = [];
-                localStorage.removeItem('doordashTrackerData');
                     gasData = [];
                     currentTrip = null;
                     startOdometer = null;
